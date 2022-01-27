@@ -15,7 +15,7 @@ import hashlib
 import secrets
 import pprint
 
-log_level = log.ERROR
+log_level = log.INFO
 log.basicConfig(filename='myapp.log', level=log.INFO)
 log.getLogger("my-logger")
 log.info("logging config loaded")
@@ -120,6 +120,62 @@ def base64_decode(my_encoded_string):
         
     return decodedStr
 
+def check_password(some_string):
+
+    if len(some_string) < 8:
+        print("password must be longer than 8 characters")
+        return False
+
+    #break apart the string into chars
+    char_list = list(some_string)
+    special_chars = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', "+"]
+    if not contains_special(char_list, special_chars):
+        print("Password must contain a special character")
+        return False
+    
+    if not contains_upper(char_list):
+        print("Password must contain an uppercase character")
+        return False
+
+    if not contains_int(char_list):
+        print("Password must contain an int")
+        return False
+    
+    #finally
+    if contains_no_space(char_list):
+        print("valid")
+        return True
+    else:
+        print("no spaces allowed in passwords >:(")
+        return False
+
+def contains_special(list_of_chars, special_chars):
+    for char in list_of_chars:
+        if char in special_chars:
+            return True
+    return False
+
+def contains_upper(list_of_chars):
+    for char in list_of_chars:
+        if char.isupper():
+            return True
+    return False
+
+def contains_int(list_of_chars):
+    for char in list_of_chars:
+        try:
+            int(char)
+            return True
+        except:
+            pass
+    return False
+
+def contains_no_space(list_of_chars):
+    for char in list_of_chars:
+        if char.isspace():
+            return False
+    return True
+
 def main():
     """
     Demo Program that will run through the process of generating and verifying hashes.
@@ -136,7 +192,7 @@ def main():
 
     # authentication block object
     block = {
-        "secret": base64_encode(random_secret(secret_length, False, True)),
+        "secret": base64_encode(random_secret(secret_length, True, True)),
         "salt": base64_encode(random_secret(salt_length, False, True)),
         "secret_length": secret_length,
         "salt_length": salt_length,
@@ -167,7 +223,9 @@ def main():
     pp.pprint(base64_decode(encoded_block))
 
     coin =  hash_a_value(string, decoded_salt, block['hash_iterations'])
-    print(coin)
-
+    #print(coin)
+    value = check_password(decoded_secret)
+    print(decoded_secret)
+    print(check_password(decoded_secret))
 
 main()
